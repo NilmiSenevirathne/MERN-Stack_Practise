@@ -1,99 +1,75 @@
-import { Grid, Button, Input, Typography } from "@mui/material";
+import { Grid, Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
-const UserForm = ({ addUser, submitted }) => {
-  const [id, setId] = useState(0);
+const UserForm = ({ addUser, selectedUser, isEdit, resetForm, updateUser }) => {
+  const [id, setId] = useState("");
   const [name, setName] = useState("");
 
   useEffect(() => {
-    if (submitted) {
-      setId(0);
+    if (selectedUser) {
+      setId(selectedUser.id);
+      setName(selectedUser.name);
+    } else {
+      setId("");
       setName("");
     }
-  }, [submitted]);
+  }, [selectedUser]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      alert("Name is required!");
+      return;
+    }
+
+    const userData = { id, name };
+    if (isEdit) {
+      updateUser(userData);
+    } else {
+      addUser(userData);
+    }
+  };
 
   return (
-    <Grid
-      container
-      spacing={2}
-      sx={{
-        backgroundColor: "#ffffff",
-        marginBottom: "30px",
-        display: "block",
-      }}
-    >
-      <Grid item xs={12}>
-        <Typography component="h1" sx={{ color: "#000000" }}>
-          User Form
-        </Typography>
-      </Grid>
+    <form onSubmit={handleSubmit}>
+      <Grid container spacing={2} sx={{ backgroundColor: "#fff", padding: "20px", marginBottom: "30px" }}>
+        <Grid item xs={12}>
+          <Typography variant="h5">{isEdit ? "Edit User" : "Add User"}</Typography>
+        </Grid>
 
-      <Grid item xs={12} sm={6} sx={{ display: "flex" }}>
-        <Typography
-          component="label"
-          htmlFor="id"
-          sx={{
-            color: "#000000",
-            marginRight: "20px",
-            fontSize: "16px",
-            width: "100px",
-            display: "block",
-          }}
-        >
-          ID
-        </Typography>
-        <Input
-          type="number"
-          id="id"
-          name="id"
-          sx={{ width: "400px" }}
-          value={id}
-          onChange={(e) => setId(parseInt(e.target.value) || 0)}
-        />
-      </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="ID"
+            type="number"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            disabled={isEdit}
+          />
+        </Grid>
 
-      <Grid item xs={12} sm={6} sx={{ display: "flex" }}>
-        <Typography
-          component="label"
-          htmlFor="name"
-          sx={{
-            color: "#000000",
-            marginRight: "20px",
-            fontSize: "16px",
-            width: "100px",
-            display: "block",
-          }}
-        >
-          Name
-        </Typography>
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          sx={{ width: "400px" }}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </Grid>
 
-      <Button
-        sx={{
-          margin: "auto",
-          marginBottom: "20px",
-          backgroundColor: "#00c6e6",
-          color: "#000000",
-          marginLeft: "15px",
-          marginTop: "20px",
-          "&:hover": {
-            opacity: "0.7",
-            backgroundColor: "#00c6e6",
-          },
-        }}
-        onClick={() => addUser({ id, name })}
-      >
-        Submit
-      </Button>
-    </Grid>
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary" sx={{ marginRight: "10px" }}>
+            {isEdit ? "Update" : "Submit"}
+          </Button>
+
+          {isEdit && (
+            <Button variant="outlined" color="secondary" onClick={resetForm}>
+              Cancel
+            </Button>
+          )}
+        </Grid>
+      </Grid>
+    </form>
   );
 };
 

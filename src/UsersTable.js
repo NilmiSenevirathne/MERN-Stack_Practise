@@ -1,52 +1,58 @@
-import { Table,Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
+import React from "react";
+import { Table, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
 
-const UsersTable = ({rows}) => {
-
-    return(
-
-    <TableContainer component={Paper}>
-        <Table>
-            <TableHead>
-                <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Actions</TableCell>
-                </TableRow>
-            </TableHead> 
-            <TableBody>
-                  {
-                    rows.length > 0 ? rows.map(row =>(
-                        <TableRow key={row.id} sx={{'&:last-child td, &:last-child th':{border:0}}}>
-                           <TableCell component='th'scope="row">{row.id}</TableCell>
-                           <TableCell component='th' scope="row">{row.name}</TableCell>
-                           <TableCell>
-                                <Button
-                                    sx={{margin:'0px 10px'}}
-                                    onClick={() =>{}}
-                                >
-                                     Update
-                                </Button>
-                           </TableCell>
-                           <TableCell>
-                                <Button
-                                    sx={{margin:'0px 10px'}}
-                                    onClick={() =>{}}
-                                >
-                                     Delete
-                                </Button>
-                           </TableCell>
-                        </TableRow>
-                    )) :(
-                        <TableRow sx={{'&:last-child td, &:last-child th':{border:0}}}>
-                           <TableCell component='th' scope="row">No data</TableCell>
-                        </TableRow>
-
-                    )
-                  }
-            </TableBody>
-
-        </Table>
+const UsersTable = ({ rows, editUser, deleteUser }) => {
+  return (
+    <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell><strong>ID</strong></TableCell>
+            <TableCell><strong>Name</strong></TableCell>
+            <TableCell><strong>Actions</strong></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.length > 0 ? (
+            rows.map((row, index) => (
+              <TableRow key={row.id ? row.id : `user-${index}`}>
+                <TableCell>{row.id}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    sx={{ marginRight: "10px" }}
+                    onClick={() => editUser(row)}
+                  >
+                    Update
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => {
+                      console.log("Deleting user with ID:", row.id);
+                      deleteUser(row);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={3} align="center">
+                No users available
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </TableContainer>
-    )
-}
+  );
+};
+
 export default UsersTable;

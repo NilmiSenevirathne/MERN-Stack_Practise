@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({});
+  const [isEdit, setIsEdit] = useState(false);
 
   useEffect(() => {
     getUsers();
@@ -16,7 +18,7 @@ const Users = () => {
   const getUsers = async () => {
     try {
       const response = await Axios.get("http://localhost:3001/api/users");
-      setUsers(response.data.response); // Ensure correct key from response
+      setUsers(response.data.response);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -34,23 +36,75 @@ const Users = () => {
 
       if (response.status === 200) {
         console.log("User added successfully");
-        getUsers(); // Fetch updated list after adding user
-        setSubmitted(false)
-      
+        getUsers();
+        setSubmitted(false);
       } else {
         console.error("Failed to add user:", response.data);
       }
     } catch (error) {
       console.error("Axios Error: ", error);
-    } finally {
-      setSubmitted(false);
     }
+  };
+
+  // Update user details
+  const updateUser = async (data) => {
+    try {
+      const payload = {
+        id: data.id,
+        name: data.name,
+      };
+
+      const response = await Axios.post("http://localhost:3001/api/updateUser", payload);
+
+      if (response.status === 200) {
+        console.log("User updated successfully");
+        getUsers();
+        setSubmitted(false);
+        setIsEdit(false);
+      } else {
+        console.error("Failed to update user:", response.data);
+      }
+    } catch (error) {
+      console.error("Axios Error: ", error);
+    }
+  };
+
+  // Delete user
+  const deleteUser = (data) => {
+    Axios.post("http://localhost:3001/api/deleteUser", { id: data.id })
+      .then((response) => {
+        alert("User deleted successfully");
+        getUsers();
+      })
+      .catch((error) => {
+        console.error("Error deleting user:", error);
+      });
   };
 
   return (
     <Box sx={{ width: "calc(100% - 100px)", margin: "auto", marginTop: "100px" }}>
-      <UserForm addUser={addUser} submitted={submitted} />
-      <UsersTable rows={users} />
+      <UserForm
+        addUser={addUser}
+        selectedUser={selectedUser}
+        isEdit={isEdit}
+        resetForm={() => {
+          setIsEdit(false);
+          setSelectedUser({});
+        }}
+        updateUser={updateUser}
+      />
+      <UsersTable
+        rows={users}
+        editUser={(user) => {
+          setSelectedUser(user);
+          setIsEdit(true);
+        }}
+        deleteUser={(user) => {
+          if (window.confirm("Are you sure you want to delete this user?")) {
+            deleteUser(user);
+          }
+        }}
+      />
     </Box>
   );
 };
